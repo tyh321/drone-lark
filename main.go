@@ -66,7 +66,8 @@ func main() {
 
 	target := branch
 	if tag != "" {
-		target = "tag " + tag
+		// target = "tag " + tag
+		target = "tag"
 	}
 
 	repoWithTarget := repo
