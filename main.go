@@ -55,6 +55,24 @@ func main() {
 	sign := generateSignature(timestamp, secret)
 
 	repo := os.Getenv("DRONE_REPO_NAME")
+	tag := os.Getenv("DRONE_TAG")
+	branch := os.Getenv("DRONE_COMMIT_BRANCH")
+	if branch == "" {
+		branch = os.Getenv("DRONE_BRANCH")
+	}
+	if branch == "" {
+		branch = os.Getenv("DRONE_REPO_BRANCH")
+	}
+
+	target := branch
+	if tag != "" {
+		target = "tag " + tag
+	}
+
+	repoWithTarget := repo
+	if target != "" {
+		repoWithTarget = repo + " " + target
+	}
 
 	var color string
 	var cnTitle string
@@ -64,12 +82,12 @@ func main() {
 
 	if os.Getenv("DRONE_BUILD_STATUS") == "success" {
 		color = "green"
-		cnTitle = "✅ " + repo + " 构建成功 #" + buildNo
-		enTitle = "✅ " + repo + " Build Successfully #" + buildNo
+		cnTitle = "✅ " + repoWithTarget + " 构建成功 #" + buildNo
+		enTitle = "✅ " + repoWithTarget + " Build Successfully #" + buildNo
 	} else {
 		color = "red"
-		cnTitle = "❌ " + repo + " 构建失败 #" + buildNo
-		enTitle = "❌ " + repo + " Build Failed #" + buildNo
+		cnTitle = "❌ " + repoWithTarget + " 构建失败 #" + buildNo
+		enTitle = "❌ " + repoWithTarget + " Build Failed #" + buildNo
 	}
 
 	header := Header{
@@ -107,23 +125,22 @@ func main() {
 	enMarkdown.WriteString(os.Getenv("DRONE_REPO_LINK"))
 	enMarkdown.WriteString(")\n")
 
-	if os.Getenv("DRONE_TAG") != "" {
+	if tag != "" {
 		cnMarkdown.WriteString("**:Pin: 标签：** <text_tag color='indigo'>")
-		cnMarkdown.WriteString(os.Getenv("DRONE_TAG"))
+		cnMarkdown.WriteString(tag)
 		cnMarkdown.WriteString("</text_tag>\n")
 
 		enMarkdown.WriteString("**:Pin: TAGS: ** <text_tag color='indigo'>")
-		enMarkdown.WriteString(os.Getenv("DRONE_TAG"))
+		enMarkdown.WriteString(tag)
 		enMarkdown.WriteString("</text_tag>\n")
 
-	} else if os.Getenv("DRONE_REPO_BRANCH") != "" {
-
+	} else if branch != "" {
 		cnMarkdown.WriteString("**:StatusReading: 分支：** <text_tag color='blue'>")
-		cnMarkdown.WriteString(os.Getenv("DRONE_REPO_BRANCH"))
+		cnMarkdown.WriteString(branch)
 		cnMarkdown.WriteString("</text_tag>\n")
 
 		enMarkdown.WriteString("**:StatusReading: BCHS: ** <text_tag color='blue'>")
-		enMarkdown.WriteString(os.Getenv("DRONE_REPO_BRANCH"))
+		enMarkdown.WriteString(branch)
 		enMarkdown.WriteString("</text_tag>\n")
 	}
 

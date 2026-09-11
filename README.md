@@ -4,8 +4,8 @@
 
 ```yml
   - name: Send Lark Message
-    image: ydq1234/drone-lark
-    pull: if-not-exists
+    image: johntian321/drone-lark
+    pull: always
     when:
       status:
         - success
@@ -19,11 +19,11 @@
 ## Build
 
 ```bash
-vi ./build.sh
-# replace ydq1234 => your account or docker hub domain
-
 chmod +x ./build.sh
 
-#export tag=xxx  （tag default is latest）
+# 构建并推送 latest 标签
 ./build.sh
+
+# 或者指定版本号
+tag=v1.0.0 ./build.sh
 ```
